@@ -4,13 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+
 public class ServerTreatment {
-	
-	static final String ID_HEADER = "header";
-	static final String ID_DATA = "data";
-	static final String ID_TYPE = "typeEvent";
-	static final String ID_USERNAME = "username";
-	
 	
 	private TreatmentController controller;
 	private ControllerFactory controllerFactory;
@@ -31,21 +26,22 @@ public class ServerTreatment {
 			// On récupère les objets JSON
 			JSONObject json_object = new JSONObject( message );
 			try {
-				JSONObject json_header = json_object.getJSONObject( ID_HEADER );
-				JSONObject json_data= json_object.getJSONObject( ID_DATA );
+				JSONObject json_header = json_object.getJSONObject( TreatmentController.ID_HEADER );
+				JSONObject json_data= json_object.getJSONObject( TreatmentController.ID_DATA );
 
 				// On récupère le controller adequat pour répondre à l'action
-				String type = json_header.getString( ID_TYPE );
+				String type = json_header.getString( TreatmentController.ID_TYPE );
 				controller = controllerFactory.create(type);
 				
 				// On récupère l'utilisateur
-				String username = json_header.getString( ID_USERNAME );
+				String username = json_header.getString( TreatmentController.ID_USERNAME );
 				
 				// On récupère la réponse au format String 
 				res = controller.treatJson( username, json_data );
 			} catch (JSONException ex1) {
 				// On n'arrive pas à parser le JSON
-				res += "JSON mal formé";
+				res += "JSON mal formé\n";
+				res+= ex1.getMessage();
 	        }
 			
 		}
