@@ -1,5 +1,7 @@
 package Server;
 
+import java.sql.SQLException;
+
 import org.json.JSONObject;
 
 abstract public class TreatmentController {
@@ -26,10 +28,29 @@ abstract public class TreatmentController {
 	}
 
 	public String treatJson( String username, JSONObject json_data) {
-		// TODO Auto-generated method stub
-		return username+" ko";
+		JSONObject jsonTreatedMessage = new JSONObject();
+		
+		try {
+			// On tente de se connecter à la base
+			this.dataManager.connect();
+
+			// On execute un traitement particulier suivant le controller
+			// Cette fonction va modifier le JSON à renvoyer (jsonTreatedMessage)
+			specificTreatment(jsonTreatedMessage, username, json_data);
+			
+			// On tente de se déconnecter de la base
+			this.dataManager.disconnect();
+			
+		} catch (SQLException | ClassNotFoundException e) {
+			// On informe que la requête n'a pas été effectuée
+			jsonTreatedMessage.accumulate( TreatmentController.ID_RESPONSE, TreatmentController.CODE_BDD_FAILURE );
+			e.printStackTrace();
+		}
+		
+		// On renvoit la chaine de caractères du json
+		return jsonTreatedMessage.toString();
 	}
 
-	
+	protected abstract void specificTreatment( JSONObject jsonTreatedMessage, String username, JSONObject json_data) throws SQLException;
 	
 }
