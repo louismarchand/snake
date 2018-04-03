@@ -1,5 +1,6 @@
 package Client;
 
+import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,9 +28,14 @@ public class TESTClient {
 	      }
 	      String line = "";
 	      try {
-				String mess_registration = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'registration'}, 'data':{'mdp':'MDP'}}";
-				String mess_login = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'authentication'}, 'data':{'connect':'true', 'mdp':'MDP'}}";
+				/**
+				 * pas d'inscription via l'appli
+				 * String mess_registration = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'registration'}, 'data':{'mdp':'MDP', 'mail':'user@user.com'}}";
+				 */
+				String mess_login = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'authentication'}, 'data':{'connect':'true', 'mdp':'123456'}}";
 				String mess_logout = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'authentication'}, 'data':{'connect':'false'}}";
+				String mess_skill_add = "{'header':{'username':'Louis', 'ipPlayer':'IPPLAYER', 'typeEvent':'skill'}, 'data':{'idSnake':'1', 'idSkill':'1', 'add':'true'}}";
+				String mess_game_left = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'game'}, 'data':{'idKey':'"+ KeyEvent.VK_DOWN +"'}}";
 				String message = mess_logout;
 	            streamOut.writeUTF(message);
 	            streamOut.flush();

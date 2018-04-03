@@ -13,6 +13,18 @@ import java.sql.Statement;
 public class DataManager {
 
 	public static DataManager instance;
+
+	public static String table_player = "Player";
+		public static String field_player_password = "PassWord";
+		public static String field_player_username = "UserName";
+	
+	public static String table_skill = "Skill";
+	
+	public static String table_masteredskill = "MasteredSkill";
+		public static String field_masteredskill_snake = "fk_idSnake";
+		public static String field_masteredskill_skill = "fk_idSkill";
+		
+	public static String table_snake = "Snake";
 	
 	private String url;
 	private String user;
@@ -24,7 +36,7 @@ public class DataManager {
 		String address = "127.0.0.1";
 		user = "UA-user";
 		mdp = "ua-user";
-		db = "snakeRPG";
+		db = "SnakeRPG_Schema";
 		this.url = "jdbc:mysql://"+ address +"/"+ this.db;
 	}
 	
@@ -49,17 +61,52 @@ public class DataManager {
 		// stmt.close(); -> est fermé après chaque utilisation
 		connector.close();
 	}
-	
+
 	/**
-	 * Ajoute un nouveau joueur en base
-	 * @param data
-	 * @param mdp 
+	 * Ajoute une compétence à un snake
+	 * @param idSnake
+	 * @param idSkill 
 	 * @throws SQLException 
 	 */
-	public boolean register ( String username, String mdp ) throws SQLException {
+	public boolean addSkill ( String idSnake, String idSkill ) throws SQLException {
 		Statement stmt = connector.createStatement();
-		String request = "insert into player values ('"+ username +"','"+ mdp +"');";
-		System.out.println(request);
+		String request = String.format( "INSERT INTO %s (%s,%s) VALUES ('%s','%s');", table_masteredskill, field_masteredskill_snake, field_masteredskill_skill, idSnake, idSkill );
+		System.out.println( request );
+		boolean ret = stmt.execute(request);
+		stmt.close();
+		
+		return ret;
+	}
+
+	/**
+	 * Enlève une compétence d'un snake
+	 * @param idSnake
+	 * @param idSkill 
+	 * @throws SQLException 
+	 */
+	public boolean removeSkill ( String idSnake, String idSkill ) throws SQLException {
+		Statement stmt = connector.createStatement();
+		String request = String.format( "DELETE FROM %s WHERE %s = '%s' AND %s = %s;", table_masteredskill, field_masteredskill_snake, idSnake, field_masteredskill_skill, idSkill );
+		System.out.println( request );
+		boolean ret = stmt.execute(request);
+		stmt.close();
+		
+		return ret;
+	}
+	
+	/**
+	 * ON NE PEUT PAS CREER DE COMPTE DIRECTEMENT VIA L'APPLI, IL FAUT PASSER PAR LE SITE (mais il vaut mieux garder la fonction au cas où)
+	 * Ajoute un nouveau joueur en base
+	 * @param username
+	 * @param mdp 
+	 * @param mail 
+	 * @throws SQLException 
+	 */
+	public boolean register ( String username, String mdp, String mail ) throws SQLException {
+		Statement stmt = connector.createStatement();
+		String mdp_hashed = HashPassword.get_SHA_512_SecurePassword(mdp);
+		String request = String.format( "INSERT INTO %s VALUES ('%s','%s', '%s', 0, 0);", table_player, username, mdp_hashed, mail );
+		System.out.println( request );
 		boolean ret = stmt.execute(request);
 		stmt.close();
 		
@@ -68,19 +115,62 @@ public class DataManager {
 	
 	/**
 	 * Connecte le joueur
-	 * @param data
+	 * @param username
 	 * @param mdp 
+	 * @throws SQLException 
 	 */
-	public void login ( String data, String mdp ) {
-		System.out.println("Login: "+ data +", mdp: "+ mdp);
+	public boolean login ( String username, String mdp ) throws SQLException {
+		UserLogged ul = UserLogged.getInstance();
+		boolean ret;
+		
+		// Si l'utilisateur est déjà connecté
+		if ( ul.contains( username ) ) {
+			System.out.println("user "+ username + " déjà co");
+			ret = false;
+		} else {
+			// On vérifie le mdp
+			Statement stmt = connector.createStatement();
+			String request = String.format("SELECT %s FROM %s WHERE %s = '%s'", field_player_password, table_player, field_player_username, username);
+			ResultSet rs = stmt.executeQuery( request );
+
+			System.out.println(request);
+			
+			// On récupère le mdp
+			rs.next();
+			String mdp_bdd = rs.getString("password");
+			
+			// On hash le mdp récupéré pour le comparer avec celui reçu
+			String mdp_hashed = HashPassword.get_SHA_512_SecurePassword(mdp);
+			
+			// Si les mdp sont égaux, on connecte l'utilisateur
+			if ( mdp_bdd.equals( mdp_hashed ) ) {
+				ul.add(username);
+//					System.out.println("Login: "+ username +", mdp: "+ mdp);
+			}
+			
+			ret = true;			
+		}
+		
+		return ret;
 	}
 
 	/**
 	 * Déconnecte le joueur
-	 * @param data
+	 * @param username
 	 */
-	public void logout ( String data ) {
-		System.out.println("Logout: "+ data);
+	public boolean logout ( String username ) {
+		UserLogged ul = UserLogged.getInstance();
+		boolean ret = true;
+		
+		// On regarde si l'utilisateur est connecté
+		if ( ul.contains( username ) ) {
+
+			System.out.println("Logout: "+ username);
+			ul.remove( username );
+			
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -93,5 +183,5 @@ public class DataManager {
 		}
 		return instance;
 	}
-	
+
 }
