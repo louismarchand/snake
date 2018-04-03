@@ -27,7 +27,10 @@ public class TESTClient {
 	      }
 	      String line = "";
 	      try {
-				String message = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'skill'}, 'data':{'idArbre':'IDARBRE', 'idCompetence':'IDCOMPETENCE', 'action': '1'}}";
+				String mess_registration = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'registration'}, 'data':{'mdp':'MDP'}}";
+				String mess_login = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'authentication'}, 'data':{'connect':'true', 'mdp':'MDP'}}";
+				String mess_logout = "{'header':{'username':'USERNAME', 'ipPlayer':'IPPLAYER', 'typeEvent':'authentication'}, 'data':{'connect':'false'}}";
+				String message = mess_logout;
 	            streamOut.writeUTF(message);
 	            streamOut.flush();
 	            while (line.equals("")) {
