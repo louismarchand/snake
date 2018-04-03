@@ -19,6 +19,7 @@ public class DataManager {
 		public static String field_player_username = "UserName";
 	
 	public static String table_skill = "Skill";
+		public static String field_skill_id = "idSkill";
 	
 	public static String table_masteredskill = "MasteredSkill";
 		public static String field_masteredskill_snake = "fk_idSnake";
@@ -93,7 +94,27 @@ public class DataManager {
 		
 		return ret;
 	}
-	
+
+	/**
+	 * Récupère les compétences d'un snake
+	 * @param idSnake
+	 * @throws SQLException 
+	 */
+	public boolean getSkills ( String idSnake ) throws SQLException {
+		Statement stmt = connector.createStatement();
+		String request = String.format("SELECT * FROM %s masteredSkill JOIN %s skill ON masteredSkill.%s = skill.%s WHERE masteredSkill.%s = %s", table_masteredskill, table_skill, field_masteredskill_skill, field_skill_id, field_masteredskill_snake, idSnake);
+		System.out.println( request );
+		ResultSet rs = stmt.executeQuery( request );
+		System.out.println("Snake n°"+idSnake);
+		while ( rs.next() ) {
+			System.out.println("\t"+rs.getString("Name"));
+		}
+		boolean ret = stmt.execute(request);
+		stmt.close();
+		
+		return ret;
+	}
+
 	/**
 	 * ON NE PEUT PAS CREER DE COMPTE DIRECTEMENT VIA L'APPLI, IL FAUT PASSER PAR LE SITE (mais il vaut mieux garder la fonction au cas où)
 	 * Ajoute un nouveau joueur en base

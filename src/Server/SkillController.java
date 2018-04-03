@@ -22,14 +22,15 @@ public class SkillController extends TreatmentController {
 		String idSnake = json_data.getString( ID_IDSNAKE );
 		String idSkill = json_data.getString( ID_IDSKILL );
 
+		this.dataManager.getSkills(idSnake);
 		// Demande l'ajout d'une compétence
-		if ( wantToAdd ) {
-			this.dataManager.addSkill( idSnake, idSkill );
-		}
-		// Demande la suppression d'une compétence
-		else {
-			this.dataManager.removeSkill( idSnake, idSkill );
-		}
+//		if ( wantToAdd ) {
+//			this.dataManager.addSkill( idSnake, idSkill );
+//		}
+//		// Demande la suppression d'une compétence
+//		else {
+//			this.dataManager.removeSkill( idSnake, idSkill );
+//		}
 		// On informe que la requête a été effectuée
 		jsonTreatedMessage.accumulate( TreatmentController.ID_RESPONSE, TreatmentController.CODE_REQUEST_DONE );
 		
