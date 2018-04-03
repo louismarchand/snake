@@ -34,9 +34,11 @@ abstract public class TreatmentController {
 			// On tente de se connecter à la base
 			this.dataManager.connect();
 
+			
 			// On execute un traitement particulier suivant le controller
 			// Cette fonction va modifier le JSON à renvoyer (jsonTreatedMessage)
 			specificTreatment(jsonTreatedMessage, username, json_data);
+			
 			
 			// On tente de se déconnecter de la base
 			this.dataManager.disconnect();
